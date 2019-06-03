@@ -11,6 +11,10 @@ const uuidv4 = require('uuid/v4');
 const moment = require('moment');
 app.use(cors());
 
+// instruction to express to translate the request
+// body into JSON
+app.use(express.json());
+
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -20,12 +24,16 @@ const connection = mysql.createConnection({
 
   app.get("/tasks", function(request, response) {
   //  const username = request.query.username;
+  //  optional - message for user
+  //  message: "Hello " + username + ", these are your tasks",
     let query = "SELECT * FROM Tasks";
-   // if (username) {
-   //   query =
-   //     "SELECT * FROM Tasks JOIN User on Tasks.UserId = User.UserId WHERE User.Username = " +
-   //     connection.escape(username);
-   // }
+
+  // username in SQL query
+  // if (username) {
+  // query =
+  // "SELECT * FROM Tasks JOIN User on Tasks.UserId = User.UserId WHERE User.Username = " +
+  // connection.escape(username);
+  // }
     connection.query(query, (err, queryResults) => {
       if (err) {
         console.log("Error fetching tasks", err);
@@ -39,35 +47,8 @@ const connection = mysql.createConnection({
       }
     });
   });
-
-  
-  //const someJson = {
-  //  message: "Hello " + username + ", how are you?"
-  // };
-  
-  // create task list
-  //const tasksJson = {
-      // optional - message for user
-  //    message: "Hello " + username + ", these are your tasks",
-      // task list array
-  //    todoListItems: [
-  //    {todoItem: "Buy cough sweets", 
-  //      date: moment("2019-11-19").format("DD-MM-YYYY"), 
-  //      completed: false, priority: false, id:uuidv4()},
-  //    {todoItem: "Do the washing",
-  //      date: moment("2019-05-12").format("DD-MM-YYYY"),
-  //      completed: false, priority: true, id:uuidv4()},
-  //    {todoItem: "Online Shopping Order", 
-  //      date: moment("2019-03-12").format("DD-MM-YYYY"), 
-  //      completed: true, priority: false, id:uuidv4()},
-  //    {todoItem: "Buy Birthday present", 
-  //      date: moment("2019-05-13").format("DD-MM-YYYY"),
-  //      completed: false, priority: false, id:uuidv4()},
-  //  ] 
-  //};
-  
-  // display task list
-//  response.json(tasksJson);
-//})
-
+  app.post("/tasks", function(request, response) {
+    const taskToBeSaved = request.body;
+    console.log(taskToBeSaved);
+  });
 module.exports.handler = serverless(app);
