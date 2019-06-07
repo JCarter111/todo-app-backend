@@ -47,20 +47,21 @@ const connection = mysql.createConnection({
       }
     });
   });
-  app.post("/tasks", function(request, response) {
-    const taskToBeSaved = request.body;
-    console.log(taskToBeSaved);
-    connection.query('INSERT INTO Tasks SET ?', taskToBeSaved, function (error, results, fields) {
-      if (error) {
-       console.log("Error saving new task", error);
-       response.status(500).json({
+app.post("/tasks", function (request, response) {
+  const taskToBeSaved = request.body;
+  console.log(taskToBeSaved);
+  const insertQuery = "INSERT INTO Tasks (description, dueDate, userId) VALUES (?, ?, ?)";
+  connection.query(insertQuery, [taskToBeSaved.description, taskToBeSaved.dueDate, taskToBeSaved.userId], function (error, results, fields) {
+    if (error) {
+      console.log("Error saving new task", error);
+      response.status(500).json({
         error: error
       });
-      } else {
-        response.json({
+    } else {
+      response.json({
         taskId: results.insertId
-        });
-      }
-    });
+      });
+    }
   });
+});
 module.exports.handler = serverless(app);
