@@ -22,6 +22,7 @@ const connection = mysql.createConnection({
   database: "Tasks"
 });
 
+  // get tasks from database
   app.get("/tasks", function(request, response) {
   //  const username = request.query.username;
   //  optional - message for user
@@ -47,11 +48,13 @@ const connection = mysql.createConnection({
       }
     });
   });
+
+// post task to database
 app.post("/tasks", function (request, response) {
   const taskToBeSaved = request.body;
   console.log(taskToBeSaved);
-  const insertQuery = "INSERT INTO Tasks (description, dueDate, userId) VALUES (?, ?, ?)";
-  connection.query(insertQuery, [taskToBeSaved.description, taskToBeSaved.dueDate, taskToBeSaved.userId], function (error, results, fields) {
+  const insertQuery = "INSERT INTO Tasks (description, dueDate, priority, completed, userId) VALUES (?, ?, ?, ?, ?)";
+  connection.query(insertQuery, [taskToBeSaved.description, taskToBeSaved.dueDate, taskToBeSaved.priority, taskToBeSaved.completed,taskToBeSaved.userId], function (error, results, fields) {
     if (error) {
       console.log("Error saving new task", error);
       response.status(500).json({
@@ -63,5 +66,46 @@ app.post("/tasks", function (request, response) {
       });
     }
   });
+});
+
+// delete task from database
+app.delete("/tasks/:taskId", function(request, response) {
+  const query =
+    "DELETE FROM Tasks WHERE taskId = " + connection.escape(request.params.taskId);
+  connection.query(query, (err, deleteResults) => {
+    if (err) {
+      console.log("Error deleting Task", err);
+      response.status(500).json({
+        error: err
+      });
+      console.log(query);
+    } else {
+      response.status(200).send("Task deleted");
+    }
+  });
+});
+
+// update a task in the database
+app.put("/tasks/:taskId", function(request, response) {
+  const task = request.body.task;
+  const id = request.params.taskId;
+  // may need to change query here
+  const query =
+    "UPDATE Tasks SET Completed = ? WHERE taskId = ?";
+    //"UPDATE Task SET Description = ?, Completed = ?, UserId = ? WHERE TaskId = ?";
+  connection.query(
+    query,
+    [id],
+    // [task.Description, task.Completed, task.UserId, id],
+    function(err, queryResponse) {
+      if (err) {
+        console.log("Error updating task", err);
+        response.status(500).send({ error: err });
+        console.log(query);
+      } else {
+        response.status(201).send("Updated");
+      }
+    }
+  );
 });
 module.exports.handler = serverless(app);
