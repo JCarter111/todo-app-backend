@@ -69,6 +69,7 @@ app.post("/tasks", function (request, response) {
 });
 
 // delete task from database
+// example of using a parameter for data update
 app.delete("/tasks/:taskId", function(request, response) {
   const query =
     "DELETE FROM Tasks WHERE taskId = " + connection.escape(request.params.taskId);
@@ -85,13 +86,14 @@ app.delete("/tasks/:taskId", function(request, response) {
   });
 });
 
-// update a task in the database
+// update a task in the database - example of using a parameter
+// for data update
 app.put("/tasks/:taskId", function(request, response) {
   const task = request.body.task;
   const id = request.params.taskId;
   // may need to change query here
   const query =
-    "UPDATE Tasks SET Completed = ? WHERE taskId = ?";
+    "UPDATE Tasks SET completed = true WHERE taskId = " + connection.escape(request.params.taskId);
     //"UPDATE Task SET Description = ?, Completed = ?, UserId = ? WHERE TaskId = ?";
   connection.query(
     query,
